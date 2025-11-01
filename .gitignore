@@ -1,4 +1,6 @@
 # Benchmarking cpython (CONTRIBUTING.md)
+.direnv/
+test_scripts/
 crates/ruff_linter/resources/test/cpython
 # generate_mkdocs.py
 mkdocs.generated.yml
