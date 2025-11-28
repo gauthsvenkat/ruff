@@ -12,7 +12,7 @@ pub use document::{NotebookDocument, PositionEncoding, TextDocument};
 pub(crate) use session::Session;
 
 mod capabilities;
-mod db;
+pub mod db;
 mod document;
 mod logging;
 mod server;

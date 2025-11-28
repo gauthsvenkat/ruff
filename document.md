@@ -100,7 +100,7 @@ Ruff already implements most of the infrastructure needed for symbol-level depen
 
 **Important**: Neither depends on the other! They are independent implementations:
 
-```
+```text
         ruff_python_ast (shared AST)
               ↑
     ┌─────────┼─────────┐
@@ -567,7 +567,7 @@ Represents a location to navigate to.
 - focus_range - The identifier
 - full_range - Complete definition including body
 
-**Can be converted to LSP Location**
+### Can be converted to LSP Location
 
 #### `GotoTarget`
 
@@ -676,7 +676,7 @@ Current `ruff analyze graph` implementation.
 
 ### How It Works
 
-```rust
+```python
 // 1. Parse all Python files in workspace
 // 2. Use ruff_graph to extract imports
 // 3. Generate ImportMap (module dependencies)
@@ -752,7 +752,7 @@ Symbol Dependency Graph
 
 ### Step-by-Step Implementation
 
-#### Step 1: Symbol Index
+1. #### Step 1: Symbol Index
 
 Build a workspace-wide symbol index.
 
@@ -768,7 +768,7 @@ Build a workspace-wide symbol index.
 - `ty_python_semantic::Definition`
 - `ty_ide::SymbolInfo`
 
-#### Step 2: Reference Graph
+2. #### Step 2: Reference Graph
 
 For each symbol, find all references.
 
@@ -785,7 +785,7 @@ For each symbol, find all references.
 - `ty_ide::ReferenceTarget`
 - `ty_ide::ReferenceKind`
 
-#### Step 3: Dependency Classification
+3. #### Step 3: Dependency Classification
 
 Classify the type of dependency.
 
@@ -800,7 +800,7 @@ Classify the type of dependency.
 - `ruff_python_ast` - AST node types
 - `ReferenceKind` - Read/Write/Other as starting point
 
-#### Step 4: File-Level Import Integration
+4. #### Step 4: File-Level Import Integration
 
 Merge with existing file-level graph.
 
@@ -815,11 +815,11 @@ Merge with existing file-level graph.
 - `ruff_graph::ImportMap`
 - `ruff_graph::Collector`
 
-#### Step 5: Query API and Output
+5. #### Step 5: Query API and Output
 
 Create API for querying the graph.
 
-```rust
+```json
 // Functions:
 //   get_dependencies(symbol) -> Vec<SymbolDependency>
 //   get_dependents(symbol) -> Vec<SymbolDependent>
@@ -904,38 +904,38 @@ pub fn build_symbol_graph(db: &dyn Db, workspace: &Workspace) -> SymbolDependenc
 ### For Understanding Current Implementation
 
 1. **`crates/ruff/src/commands/analyze_graph.rs:48`**
-   - Current file-level graph command
-   - Shows CLI structure and output format
+    - Current file-level graph command
+    - Shows CLI structure and output format
 
 2. **`crates/ruff_graph/src/lib.rs`**
-   - Import map data structures
-   - How file dependencies are represented
+    - Import map data structures
+    - How file dependencies are represented
 
 ### For Symbol Resolution
 
 3. **`crates/ty_python_semantic/src/semantic_index/definition.rs`**
-   - How symbols are defined and tracked
-   - Stable symbol IDs
+    - How symbols are defined and tracked
+    - Stable symbol IDs
 
 4. **`crates/ty_python_semantic/src/semantic_model.rs:83`**
-   - Main API for semantic queries
-   - How to ask "what symbols are visible here?"
+    - Main API for semantic queries
+    - How to ask "what symbols are visible here?"
 
 ### For Cross-File Analysis
 
 5. **`crates/ty_ide/src/references.rs:42`**
-   - **MOST IMPORTANT**: Core implementation of reference finding
-   - Shows how to find all uses of a symbol across workspace
+    - **MOST IMPORTANT**: Core implementation of reference finding
+    - Shows how to find all uses of a symbol across workspace
 
 6. **`crates/ty_ide/src/workspace_symbols.rs:30`**
-   - How to index all symbols in workspace
-   - Parallel processing pattern
+    - How to index all symbols in workspace
+    - Parallel processing pattern
 
 ### For Integration
 
 7. **`crates/ty_server/src/server/api/requests/references.rs`**
-   - Example of using `goto_references()` from LSP
-   - Shows complete flow from request to response
+    - Example of using `goto_references()` from LSP
+    - Shows complete flow from request to response
 
 ---
 
@@ -984,34 +984,34 @@ User Request: "ruff analyze symbols"
 ### What You Need to Build 🔨
 
 1. **Symbol-to-Symbol Dependency Graph**
-   - Currently: file imports → file
-   - Needed: symbol uses → symbol definition
-   - **Solution**: Use `goto_references()` for each symbol
+    - Currently: file imports → file
+    - Needed: symbol uses → symbol definition
+    - **Solution**: Use `goto_references()` for each symbol
 
 2. **Cross-File Symbol Index**
-   - Currently: Per-file symbol tables
-   - Needed: Workspace-wide unified index
-   - **Solution**: Aggregate `workspace_symbols()` + `all_symbols()`
+    - Currently: Per-file symbol tables
+    - Needed: Workspace-wide unified index
+    - **Solution**: Aggregate `workspace_symbols()` + `all_symbols()`
 
 3. **Dependency Type Classification**
-   - Currently: Generic references
-   - Needed: Import vs. call vs. type vs. inheritance
-   - **Solution**: Examine AST context of each reference
+    - Currently: Generic references
+    - Needed: Import vs. call vs. type vs. inheritance
+    - **Solution**: Examine AST context of each reference
 
 4. **Scope-Aware Visibility Rules**
-   - Currently: Basic public/private
-   - Needed: Re-exports, aliasing, `__all__`
-   - **Solution**: Use `Scope::visibility()` and definition metadata
+    - Currently: Basic public/private
+    - Needed: Re-exports, aliasing, `__all__`
+    - **Solution**: Use `Scope::visibility()` and definition metadata
 
 5. **Graph Query API**
-   - Currently: N/A
-   - Needed: Query dependencies, dependents, paths
-   - **Solution**: Standard graph traversal algorithms
+    - Currently: N/A
+    - Needed: Query dependencies, dependents, paths
+    - **Solution**: Standard graph traversal algorithms
 
 6. **Output Format**
-   - Currently: JSON for file graph
-   - Needed: Symbol graph JSON/DOT/Mermaid
-   - **Solution**: Serialize graph structure
+    - Currently: JSON for file graph
+    - Needed: Symbol graph JSON/DOT/Mermaid
+    - **Solution**: Serialize graph structure
 
 ---
 
@@ -1106,25 +1106,6 @@ ruff analyze symbols --symbol MyClass --direction dependents
 
 ---
 
-## References
-
-### Ruff Documentation
-
-- Main repo: <https://github.com/astral-sh/ruff>
-- Ruff graph docs: (check docs/ folder)
-
-### Salsa
-
-- Salsa book: <https://salsa-rs.github.io/salsa/>
-
-### Related Tools
-
-- pydeps: Python module dependency graphs
-- pyreverse: UML diagrams from Python code
-- sourcetrail: Interactive source explorer
-
----
-
 ## Questions & Considerations
 
 ### Open Questions
@@ -1148,3 +1129,8 @@ ruff analyze symbols --symbol MyClass --direction dependents
 
 - **2025-11-28**: Initial analysis document created
 - **2025-11-28**: Added architectural analysis of `ruff_python_semantic` vs `ty_python_semantic` - clarified the dual semantic systems (linter vs type checker)
+- **2025-11-28**: Implemented basic `ruff symbols` command.
+    - Initialized `ProjectDatabase` and used `ty_ide::workspace_symbols` to list all Python symbols in the workspace.
+    - Identified and fixed several compilation errors related to `ty_*` crate APIs, including making `ty_server::db` public.
+    - The command successfully lists symbols from the entire workspace (including vendored typeshed stubs and test fixtures) when a non-empty query is provided.
+    - Next step is to implement file-specific symbol listing and dependency graph generation.

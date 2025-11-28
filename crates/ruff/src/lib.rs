@@ -201,7 +201,7 @@ pub fn run(
         Command::Format(args) => format(args, global_options),
         Command::Server(args) => server(args),
         Command::Analyze(AnalyzeCommand::Graph(args)) => analyze_graph(args, global_options),
-        Command::Symbols(args) => symbols(args),
+        Command::Symbols(args) => symbols(args, global_options),
     }
 }
 
@@ -234,8 +234,9 @@ fn server(args: ServerCommand) -> Result<ExitStatus> {
     commands::server::run_server(args.resolve_preview())
 }
 
-fn symbols(args: SymbolsCommand) -> Result<ExitStatus> {
-    commands::symbols::symbols(args)
+fn symbols(args: SymbolsCommand, global_options: GlobalConfigArgs) -> Result<ExitStatus> {
+    let (cli, config_arguments) = args.partition(global_options)?;
+    commands::symbols::symbols(&cli, &config_arguments)
 }
 
 pub fn check(args: CheckCommand, global_options: GlobalConfigArgs) -> Result<ExitStatus> {

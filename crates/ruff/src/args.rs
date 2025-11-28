@@ -211,6 +211,26 @@ pub struct SymbolsCommand {
     pub files: Vec<PathBuf>,
 }
 
+pub struct SymbolsArgs {
+    pub files: Vec<PathBuf>,
+}
+
+impl SymbolsCommand {
+    /// Partition the CLI into command-line arguments and configuration
+    /// overrides.
+    pub fn partition(
+        self,
+        global_options: GlobalConfigArgs,
+    ) -> anyhow::Result<(SymbolsArgs, ConfigArguments)> {
+        let symbols_arguments = SymbolsArgs { files: self.files };
+
+        let cli_overrides = ExplicitConfigOverrides::default();
+
+        let config_args = ConfigArguments::from_cli_arguments(global_options, cli_overrides)?;
+        Ok((symbols_arguments, config_args))
+    }
+}
+
 // The `Parser` derive is for ruff_dev, for ruff `Args` would be sufficient
 #[derive(Clone, Debug, clap::Parser)]
 #[expect(clippy::struct_excessive_bools)]
@@ -650,7 +670,7 @@ impl From<&LogLevelArgs> for LogLevel {
 }
 
 /// Configuration-related arguments passed via the CLI.
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
 pub struct ConfigArguments {
     /// Whether the user specified --isolated on the command line
     pub(crate) isolated: bool,
@@ -1325,7 +1345,7 @@ pub struct AnalyzeGraphArgs {
 
 /// Configuration overrides provided via dedicated CLI flags:
 /// `--line-length`, `--respect-gitignore`, etc.
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 struct ExplicitConfigOverrides {
     dummy_variable_rgx: Option<Regex>,
     exclude: Option<Vec<FilePattern>>,

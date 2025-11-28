@@ -2914,6 +2914,9 @@ dependencies = [
  "tikv-jemallocator",
  "toml",
  "tracing",
+ "ty_ide",
+ "ty_project",
+ "ty_server",
  "walkdir",
  "wild",
 ]
