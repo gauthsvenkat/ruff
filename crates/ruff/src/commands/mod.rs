@@ -13,4 +13,5 @@ pub(crate) mod rule;
 pub(crate) mod server;
 pub(crate) mod show_files;
 pub(crate) mod show_settings;
+pub(crate) mod symbols;
 pub(crate) mod version;

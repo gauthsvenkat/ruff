@@ -21,7 +21,7 @@ use ruff_linter::{fs, warn_user, warn_user_once};
 use ruff_workspace::Settings;
 
 use crate::args::{
-    AnalyzeCommand, AnalyzeGraphCommand, Args, CheckCommand, Command, FormatCommand,
+    AnalyzeCommand, AnalyzeGraphCommand, Args, CheckCommand, Command, FormatCommand, SymbolsCommand,
 };
 use crate::printer::{Flags as PrinterFlags, Printer};
 
@@ -201,6 +201,7 @@ pub fn run(
         Command::Format(args) => format(args, global_options),
         Command::Server(args) => server(args),
         Command::Analyze(AnalyzeCommand::Graph(args)) => analyze_graph(args, global_options),
+        Command::Symbols(args) => symbols(args),
     }
 }
 
@@ -231,6 +232,10 @@ fn analyze_graph(
 
 fn server(args: ServerCommand) -> Result<ExitStatus> {
     commands::server::run_server(args.resolve_preview())
+}
+
+fn symbols(args: SymbolsCommand) -> Result<ExitStatus> {
+    commands::symbols::symbols(args)
 }
 
 pub fn check(args: CheckCommand, global_options: GlobalConfigArgs) -> Result<ExitStatus> {

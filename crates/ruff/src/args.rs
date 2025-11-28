@@ -153,6 +153,8 @@ pub enum Command {
     /// Run analysis over Python source code.
     #[clap(subcommand)]
     Analyze(AnalyzeCommand),
+    /// Analyze symbol dependencies in Python source code (experimental).
+    Symbols(SymbolsCommand),
     /// Display Ruff's version
     Version {
         #[arg(long, value_enum, default_value = "text")]
@@ -200,6 +202,13 @@ pub struct AnalyzeGraphCommand {
     type_checking_imports: bool,
     #[arg(long, overrides_with("type_checking_imports"), hide = true)]
     no_type_checking_imports: bool,
+}
+
+#[derive(Clone, Debug, clap::Parser)]
+pub struct SymbolsCommand {
+    /// List of files or directories to analyze.
+    #[clap(help = "List of files or directories to analyze [default: .]")]
+    pub files: Vec<PathBuf>,
 }
 
 // The `Parser` derive is for ruff_dev, for ruff `Args` would be sufficient
